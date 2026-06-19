@@ -4,6 +4,9 @@ from rest_framework.permissions import AllowAny
 
 from cart.models import Cart
 from .models import Order, OrderItem
+from rest_framework import generics
+from .models import ShippingAddress
+from .serializers import ShippingAddressSerializer
 
 
 class CreateOrderAPIView(APIView):
@@ -13,6 +16,16 @@ class CreateOrderAPIView(APIView):
     def post(self, request):
 
         user_id = request.data.get("user_id")
+        shipping_address_id = request.data.get("shipping_address_id")
+
+        shipping_address = ShippingAddress.objects.filter(
+            id=shipping_address_id
+        ).first()
+
+        if not shipping_address:
+            return Response({
+                "error": "Invalid shipping address"
+            }, status=400)
 
         cart = Cart.objects.filter(
             user_id=user_id
@@ -24,8 +37,9 @@ class CreateOrderAPIView(APIView):
             })
 
         order = Order.objects.create(
-            user_id=user_id
-        )
+        user_id=user_id,
+        shipping_address=shipping_address
+    )
 
         total = 0
 
@@ -50,7 +64,6 @@ class CreateOrderAPIView(APIView):
             "order_id": order.id,
             "total_amount": total
         })
-from .models import Order
 
 
 class OrderListAPIView(APIView):
@@ -102,14 +115,25 @@ class OrderDetailAPIView(APIView):
             })
 
         return Response({
-            "id": order.id,
-            "user_id": order.user.id,
-            "email": order.user.email,
-            "total_amount": order.total_amount,
-            "status": order.status,
-            "created_at": order.created_at,
-            "items": items
-        })
+    "id": order.id,
+    "user_id": order.user.id,
+    "email": order.user.email,
+    "total_amount": order.total_amount,
+    "status": order.status,
+    "created_at": order.created_at,
+
+    "shipping_address": {
+        "full_name": order.shipping_address.full_name,
+        "phone": order.shipping_address.phone,
+        "address": order.shipping_address.address,
+        "city": order.shipping_address.city,
+        "state": order.shipping_address.state,
+        "pincode": order.shipping_address.pincode,
+        "country": order.shipping_address.country
+    },
+
+    "items": items
+})
 class UpdateOrderStatusAPIView(APIView):
 
     permission_classes = [AllowAny]
@@ -134,3 +158,10 @@ class UpdateOrderStatusAPIView(APIView):
             "message": "Order status updated",
             "status": order.status
         })
+class ShippingAddressListCreateAPIView(
+    generics.ListCreateAPIView
+):
+
+    queryset = ShippingAddress.objects.all()
+
+    serializer_class = ShippingAddressSerializer

@@ -17,6 +17,13 @@ class Order(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
+    shipping_address = models.ForeignKey(
+        "ShippingAddress",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
 
     total_amount = models.DecimalField(
         max_digits=10,
@@ -60,3 +67,33 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return self.product.name
+class ShippingAddress(models.Model):
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    full_name = models.CharField(max_length=100)
+
+    phone = models.CharField(max_length=15)
+
+    address = models.TextField()
+
+    city = models.CharField(max_length=100)
+
+    state = models.CharField(max_length=100)
+
+    pincode = models.CharField(max_length=10)
+
+    country = models.CharField(
+        max_length=100,
+        default="India"
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.full_name

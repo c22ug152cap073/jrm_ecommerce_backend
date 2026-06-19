@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from rest_framework import serializers
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -25,3 +26,21 @@ class RegisterSerializer(serializers.ModelSerializer):
             phone_number=validated_data.get("phone_number"),
             password=validated_data["password"]
         )
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)
+
+class VerifyOTPSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()
+
+    otp = serializers.CharField(
+        max_length=6
+    )
+class ResetPasswordSerializer(serializers.Serializer):
+
+    email = serializers.EmailField()
+
+    new_password = serializers.CharField(
+        min_length=8
+    )
