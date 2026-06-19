@@ -35,7 +35,6 @@ ALLOWED_HOSTS = [
     "z12.7d8.mytemp.website",
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -53,6 +52,7 @@ INSTALLED_APPS = [
     'accounts',
     'products',
     'cart',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -96,6 +96,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+# Database
+# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': {

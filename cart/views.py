@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from .models import Cart, CartItem
@@ -13,24 +13,22 @@ from .serializers import (
 
 
 class AddToCartAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+
+    permission_classes = [AllowAny]
 
     def post(self, request):
 
-        serializer = AddToCartSerializer(
-            data=request.data
-        )
+        serializer = AddToCartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        serializer.is_valid(
-            raise_exception=True
-        )
+        user_id = request.data.get("user_id")
 
         product = Product.objects.get(
             id=serializer.validated_data["product_id"]
         )
 
         cart, created = Cart.objects.get_or_create(
-            user=request.user
+            user_id=user_id
         )
 
         item, created = CartItem.objects.get_or_create(
@@ -40,6 +38,8 @@ class AddToCartAPIView(APIView):
 
         if not created:
             item.quantity += serializer.validated_data["quantity"]
+        else:
+            item.quantity = serializer.validated_data["quantity"]
 
         item.save()
 
@@ -50,12 +50,14 @@ class AddToCartAPIView(APIView):
 
 class CartAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get(self, request):
 
+        user_id = request.query_params.get("user_id")
+
         cart = Cart.objects.filter(
-            user=request.user
+            user_id=user_id
         ).first()
 
         if not cart:
@@ -71,15 +73,16 @@ class CartAPIView(APIView):
 
 class UpdateCartAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def put(self, request):
 
+        user_id = request.data.get("user_id")
         product_id = request.data.get("product_id")
         quantity = request.data.get("quantity")
 
         cart = Cart.objects.filter(
-            user=request.user
+            user_id=user_id
         ).first()
 
         if not cart:
@@ -105,16 +108,19 @@ class UpdateCartAPIView(APIView):
         return Response({
             "message": "Cart updated successfully"
         })
+
+
 class RemoveCartItemAPIView(APIView):
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def delete(self, request):
 
+        user_id = request.data.get("user_id")
         product_id = request.data.get("product_id")
 
         cart = Cart.objects.filter(
-            user=request.user
+            user_id=user_id
         ).first()
 
         if not cart:
