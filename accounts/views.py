@@ -1,17 +1,20 @@
-from rest_framework import generics
-from rest_framework.permissions import AllowAny
+from rest_framework import generics, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+from django.utils import timezone
+from datetime import timedelta
+import random
+from django.core.mail import send_mail
 
 from .models import User
-from .serializers import RegisterSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import authenticate
-from rest_framework.views import APIView
-
-from rest_framework.permissions import IsAuthenticated
-
-from .serializers import RegisterSerializer, ChangePasswordSerializer, ResetPasswordSerializer
+from .serializers import (
+    RegisterSerializer,
+    ChangePasswordSerializer,
+    ResetPasswordSerializer,
+)
 
 import random
 from django.utils import timezone
@@ -26,17 +29,23 @@ class RegisterAPIView(generics.CreateAPIView):
 
 class LoginAPIView(APIView):
 
-    permission_classes = [AllowAny]
-
     def post(self, request):
+
+        print("===== LOGIN API CALLED =====")
+        print("DATA:", request.data)
+
         email = request.data.get("email")
         password = request.data.get("password")
 
+        print("EMAIL:", email)
+
         user = authenticate(
             request,
-            email=email,
+            username=email,
             password=password
         )
+
+        print("USER:", user)
 
         if user is None:
             return Response(

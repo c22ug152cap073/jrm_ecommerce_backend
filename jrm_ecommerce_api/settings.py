@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'products',
     'cart',
     'orders',
+    "banners",
 ]
 
 MIDDLEWARE = [
@@ -184,3 +185,10 @@ SIMPLE_JWT = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'accounts.User'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+RAZORPAY_KEY_ID = "rzp_test_T3piCvYDAKto87"
+RAZORPAY_KEY_SECRET = "Wvf4OLVI7m6GzVq12k2aAIN4"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"

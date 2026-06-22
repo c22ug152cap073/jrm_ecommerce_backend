@@ -4,7 +4,10 @@ from .views import (
     OrderListAPIView,
     OrderDetailAPIView,
     UpdateOrderStatusAPIView,
-    ShippingAddressListCreateAPIView
+    ShippingAddressListCreateAPIView,
+    CreatePaymentAPIView,
+    GenerateInvoiceAPIView,
+    CreateRazorpayOrderAPIView,
 
 
 )
@@ -18,4 +21,16 @@ urlpatterns = [
         "shipping-address/",
         ShippingAddressListCreateAPIView.as_view()
     ),
+    path(
+    "payment/",
+    CreatePaymentAPIView.as_view()
+),
+    path(
+    "invoice/",
+    GenerateInvoiceAPIView.as_view()
+),
+path(
+    "razorpay/create-order/",
+    CreateRazorpayOrderAPIView.as_view()
+),
 ]
