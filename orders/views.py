@@ -278,3 +278,39 @@ class CreateRazorpayOrderAPIView(APIView):
             "amount": razorpay_order["amount"],
             "currency": razorpay_order["currency"]
         })
+class VerifyPaymentAPIView(APIView):
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+
+        razorpay_order_id = request.data.get(
+            "razorpay_order_id"
+        )
+
+        razorpay_payment_id = request.data.get(
+            "razorpay_payment_id"
+        )
+
+        razorpay_signature = request.data.get(
+            "razorpay_signature"
+        )
+
+        payment = Payment.objects.filter(
+            razorpay_order_id=razorpay_order_id
+        ).first()
+
+        if not payment:
+            return Response(
+                {"error": "Payment not found"},
+                status=404
+            )
+
+        payment.razorpay_payment_id = razorpay_payment_id
+        payment.razorpay_signature = razorpay_signature
+        payment.payment_status = "Success"
+        payment.save()
+
+        return Response({
+            "message": "Payment Verified Successfully"
+        })

@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     CategoryListAPIView,
     ProductListAPIView,
-    ProductDetailAPIView
+    ProductDetailAPIView,
+    ProductSearchAPIView
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
         "<int:pk>/",
         ProductDetailAPIView.as_view()
     ),
+     path("search/", ProductSearchAPIView.as_view()),
 ]

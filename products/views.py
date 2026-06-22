@@ -42,11 +42,11 @@ class ProductListAPIView(
     ]
 
     search_fields = [
-        "name",
-        "description",
-        "sku",
-    ]
-
+    "name",
+    "description",
+    "sku",
+    "category__name",
+]
     ordering_fields = [
         "price",
         "created_at",
@@ -58,3 +58,19 @@ class ProductDetailAPIView(
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
+
+class ProductSearchAPIView(generics.ListAPIView):
+
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+
+        keyword = self.request.GET.get("q")
+
+        if keyword:
+            return Product.objects.filter(
+                name__icontains=keyword
+            )
+
+        return Product.objects.none()

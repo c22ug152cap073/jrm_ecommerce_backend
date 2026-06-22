@@ -55,6 +55,9 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(
         default=0
     )
+    is_featured = models.BooleanField(
+    default=False
+    )
 
     sku = models.CharField(
         max_length=100,
