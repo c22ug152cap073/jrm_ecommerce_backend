@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path, include
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -35,8 +35,13 @@ urlpatterns = [
     include("returns.urls")),
     path(
     "api/v1/newsletter/",
-    include("newsletter.urls")
-),
+    include("newsletter.urls")),
+    path(
+    "api/v1/wishlist/",
+    include("wishlist.urls")),
+    path(
+    "api/v1/notifications/",
+    include("notifications.urls")),
 ]
 
 if settings.DEBUG:

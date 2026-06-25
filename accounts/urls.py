@@ -3,6 +3,7 @@ from .views import (
     RegisterAPIView,
     LoginAPIView,
     ProfileAPIView,
+    UpdateProfileAPIView,
     ChangePasswordAPIView,
     ForgotPasswordAPIView,
     VerifyOTPAPIView,
@@ -17,5 +18,8 @@ urlpatterns = [
     path("forgot-password/", ForgotPasswordAPIView.as_view()),
     path("verify-otp/", VerifyOTPAPIView.as_view()),
     path("reset-password/", ResetPasswordAPIView.as_view()),
+    path(
+    "profile/update/",
+    UpdateProfileAPIView.as_view()),
     
 ]

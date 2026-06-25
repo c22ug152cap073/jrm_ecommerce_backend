@@ -5,6 +5,8 @@ from .models import ReturnRefund
 from .serializers import ReturnRefundSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from utils.email_service import send_notification_email
+from orders.models import OrderItem
 
 
 
@@ -17,6 +19,16 @@ class ReturnRefundListCreateAPIView(
     serializer_class = ReturnRefundSerializer
 
     permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+
+        return_request = serializer.save()
+
+        send_notification_email(
+            "Return Request Submitted",
+            f"Your return request for Order #{return_request.order.id} has been received.",
+            return_request.order.user.email
+        )
 
 class UpdateReturnStatusAPIView(APIView):
 
@@ -36,6 +48,21 @@ class UpdateReturnStatusAPIView(APIView):
 
         return_request.status = status_value
         return_request.save()
+
+        if status_value == "Approved":
+            order_items = OrderItem.objects.filter(
+                order=return_request.order
+            )
+
+            for item in order_items:
+                item.product.stock += item.quantity
+                item.product.save()
+
+            send_notification_email(
+                "Refund Approved",
+                f"Your refund request for Order #{return_request.order.id} has been approved.",
+                return_request.order.user.email
+            )
 
         return Response({
             "message": "Return status updated",

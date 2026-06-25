@@ -59,6 +59,9 @@ INSTALLED_APPS = [
     'contact',
     'returns',
     'newsletter',
+    'wishlist',
+    'notifications',
+    "recent",
 
 ]
 
@@ -199,6 +202,13 @@ RAZORPAY_KEY_SECRET = "Wvf4OLVI7m6GzVq12k2aAIN4"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "admin@ecommerce.com"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "pavithsutharsan@gmail.com"
+EMAIL_HOST_PASSWORD = "knwe qbup kwzg bkgm"
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

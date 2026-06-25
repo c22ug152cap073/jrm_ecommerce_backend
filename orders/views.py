@@ -9,6 +9,7 @@ from .models import ShippingAddress
 from .serializers import ShippingAddressSerializer,PaymentSerializer,InvoiceSerializer
 import razorpay
 from django.conf import settings
+from utils.email_service import send_notification_email
 
 
 class CreateOrderAPIView(APIView):
@@ -39,13 +40,20 @@ class CreateOrderAPIView(APIView):
             })
 
         order = Order.objects.create(
-        user_id=user_id,
-        shipping_address=shipping_address
-    )
+            user_id=user_id,
+            shipping_address=shipping_address
+        )
 
         total = 0
 
         for item in cart.items.all():
+            if item.product.stock < item.quantity:
+                return Response(
+                    {
+                        "error": f"{item.product.name} is out of stock"
+                    },
+                    status=400
+                )
 
             OrderItem.objects.create(
                 order=order,
@@ -53,14 +61,23 @@ class CreateOrderAPIView(APIView):
                 quantity=item.quantity,
                 price=item.product.price
             )
+            item.product.stock -= item.quantity
+            item.product.save()
 
             total += item.product.price * item.quantity
 
         order.total_amount = total
         order.save()
 
-        cart.items.all().delete()
+        send_notification_email(
+            "Order Confirmed",
+            f"Your order #{order.id} has been placed successfully. Total Amount: ₹{total}",
+            order.user.email
+        )
 
+        cart.items.all().delete()
+        
+   
         return Response({
             "message": "Order placed successfully",
             "order_id": order.id,

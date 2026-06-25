@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import timedelta
 import random
 from django.core.mail import send_mail
+from .profile_serializers import ProfileSerializer
 
 from .models import User
 from .serializers import (
@@ -208,4 +209,26 @@ class ResetPasswordAPIView(APIView):
 
         return Response({
             "message": "Password reset successfully"
+        })
+class UpdateProfileAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+
+        serializer = ProfileSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+
+        serializer.is_valid(
+            raise_exception=True
+        )
+
+        serializer.save()
+
+        return Response({
+            "message": "Profile updated successfully",
+            "data": serializer.data
         })
